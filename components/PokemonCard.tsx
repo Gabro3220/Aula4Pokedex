@@ -48,10 +48,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
-  image: { 
-    width: 100, 
-    height: 100 
-  },
+  image: { width: 100, height: 100 },
   imageFallback: {
     width: 100,
     height: 100,
@@ -60,19 +57,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  fallbackText: {
-    fontSize: 10,
-    color: '#777',
-  },
-  name: {
-    marginTop: 8,
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  types: {
-    marginTop: 4,
-    fontSize: 12,
-    color: '#666',
-  },
+  fallbackText: { fontSize: 10, color: '#777' },
+  name: { marginTop: 8, fontSize: 16, fontWeight: 'bold', color: '#333' },
+  types: { marginTop: 4, fontSize: 12, color: '#666' },
 });
