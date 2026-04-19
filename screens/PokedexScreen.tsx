@@ -38,10 +38,6 @@ export const PokedexScreen = () => {
     () => pokemons.filter((pokemon) => pokemon.name.includes(search.toLowerCase().trim())),
     [pokemons, search]
   );
-  const hasSearchTerm = search.trim().length > 0;
-  const listEmptyMessage = hasSearchTerm
-    ? `Nenhum Pokemon encontrado para "${search.trim()}".`
-    : 'Nenhum Pokemon para exibir no momento.';
 
   return (
     <View style={styles.container}>
@@ -63,7 +59,7 @@ export const PokedexScreen = () => {
           numColumns={2}
           contentContainerStyle={styles.list}
           renderItem={({ item }) => <PokemonCard pokemon={item} />}
-          ListEmptyComponent={<Text style={styles.empty}>{listEmptyMessage}</Text>}
+          ListEmptyComponent={<Text style={styles.empty}>Nenhum pokemon encontrado.</Text>}
         />
       ) : null}
     </View>
