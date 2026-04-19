@@ -17,42 +17,34 @@ export const PokedexScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // PokedexScreen.tsx
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        const list = await getPokemons(30);
+        const details = await Promise.all(
+          list.map(async (pokemon: any) => {
+            const response = await getPokemonDetails(pokemon.url);
+            return {
+              id: response.id,
+              name: response.name,
+              types: response.types,
+              image: response.sprites.other['official-artwork'].front_default || response.sprites.front_default,
+            };
+          })
+        );
+        setPokemons(details);
+      } catch (err) {
+        setError('Falha ao carregar Pokémons. Verifique sua conexão.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-useEffect(() => {
-  const fetchData = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      const list = await getPokemons(30);
-      
-      const details = await Promise.all(
-        list.map(async (pokemon: any) => {
-          const response = await getPokemonDetails(pokemon.url);
-          
-          // AQUI ESTÁ O MAPEAMENTO:
-          // Transformamos o dado bruto da API no formato que seu componente entende
-          return {
-            id: response.id,
-            name: response.name,
-            types: response.types,
-            // Pegamos a imagem oficial (que é a mais bonita)
-            image: response.sprites.other['official-artwork'].front_default || response.sprites.front_default,
-          };
-        })
-      );
-      
-      setPokemons(details);
-    } catch (err) {
-      setError('Falha ao carregar Pokémons. Verifique sua conexão.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  fetchData();
-}, []);
+    fetchData();
+  }, []);
 
   const filteredPokemons = useMemo(
     () => pokemons.filter((pokemon) => 
@@ -60,6 +52,24 @@ useEffect(() => {
     ),
     [pokemons, search]
   );
+
+  const renderEmptyList = () => {
+    if (isLoading || error) return null;
+
+    if (search.trim().length > 0) {
+      return (
+        <Text style={styles.empty}>
+          Nenhum Pokémon encontrado para '{search}'.
+        </Text>
+      );
+    }
+
+    return (
+      <Text style={styles.empty}>
+        Nenhum Pokémon para exibir no momento.
+      </Text>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -72,7 +82,6 @@ useEffect(() => {
         onChangeText={setSearch}
       />
 
-      {/* Indicador de Carregamento centralizado */}
       {isLoading && (
         <View style={styles.center}>
           <ActivityIndicator size="large" color="#FF0000" />
@@ -80,24 +89,25 @@ useEffect(() => {
         </View>
       )}
 
-      {/* Mensagem de Erro amigável */}
       {error && !isLoading && (
         <View style={styles.center}>
           <Text style={styles.error}>{error}</Text>
         </View>
       )}
 
-      {/* Lista de Pokémons */}
       {!isLoading && !error && (
         <FlatList
           data={filteredPokemons}
           keyExtractor={(item) => item.id.toString()}
           numColumns={2}
           contentContainerStyle={styles.list}
-          renderItem={({ item }) => <PokemonCard pokemon={item} />}
-          ListEmptyComponent={
-            <Text style={styles.empty}>Nenhum pokemon encontrado.</Text>
-          }
+          renderItem={({ item }) => (
+            <PokemonCard 
+              pokemon={item} 
+              onPress={() => console.log('Ação de clique')} 
+            />
+          )}
+          ListEmptyComponent={renderEmptyList}
         />
       )}
     </View>
@@ -142,7 +152,8 @@ const styles = StyleSheet.create({
   },
   empty: {
     textAlign: 'center',
-    marginTop: 20,
+    marginTop: 40,
     color: '#666',
+    fontSize: 16,
   },
 });

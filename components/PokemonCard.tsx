@@ -1,26 +1,21 @@
-// PokemonCard.tsx
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'; // Importe TouchableOpacity
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Pokemon } from '../types/Pokemon';
 import { capitalize } from '../utils/format';
 
 interface Props {
   pokemon: Pokemon;
-  onPress?: () => void; // Adicione esta linha
+  onPress?: () => void;
 }
 
 export const PokemonCard = ({ pokemon, onPress }: Props) => {
   return (
-    <TouchableOpacity 
-      style={styles.card} 
-      onPress={onPress} // Aciona a função de clique
-      activeOpacity={0.7}
-    >
+    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.7}>
       {pokemon.image ? (
         <Image 
           source={{ uri: pokemon.image }} 
           style={styles.image} 
-          resizeMode="contain"
+          resizeMode="contain" 
         />
       ) : (
         <View style={styles.imageFallback}>
@@ -32,12 +27,12 @@ export const PokemonCard = ({ pokemon, onPress }: Props) => {
       
       <Text style={styles.types}>
         {pokemon.types
-          .map((t: any) => capitalize(t.type.name))
+          .map((t: any) => capitalize(t.type.name)) 
           .join(' • ')}
       </Text>
     </TouchableOpacity>
   );
-};;
+};
 
 const styles = StyleSheet.create({
   card: {
@@ -47,14 +42,14 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 16,
     alignItems: 'center',
-    elevation: 3, // Sombra no Android
-    shadowColor: '#000', // Sombra no iOS
+    elevation: 3,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
   image: { 
-    width: 100, // Aumentei um pouco para aparecer melhor
+    width: 100, 
     height: 100 
   },
   imageFallback: {
