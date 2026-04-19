@@ -7,11 +7,13 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getPokemonDetails, getPokemons } from '../services/api';
 import { Pokemon } from '../types/Pokemon';
 import { PokemonCard } from '../components/PokemonCard';
 
 export const PokedexScreen = () => {
+  const insets = useSafeAreaInsets();
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -112,7 +114,7 @@ export const PokedexScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <Text style={styles.title}>Pokedex</Text>
       
       <TextInput
@@ -158,13 +160,49 @@ export const PokedexScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingTop: 40, paddingHorizontal: 16, backgroundColor: '#fff' },
-  title: { fontSize: 32, fontWeight: 'bold', marginBottom: 12 },
-  input: { backgroundColor: '#f1f1f1', padding: 12, borderRadius: 8, marginBottom: 20 },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  loadingText: { marginTop: 10, color: '#666' },
-  list: { paddingBottom: 24 },
-  error: { textAlign: 'center', color: '#b00020', fontSize: 16, fontWeight: '600' },
-  empty: { textAlign: 'center', marginTop: 40, color: '#666', fontSize: 16 },
-  footer: { paddingVertical: 20, justifyContent: 'center', alignItems: 'center' },
+  container: { 
+    flex: 1, 
+    paddingHorizontal: 16, 
+    backgroundColor: '#fff' 
+  },
+  title: { 
+    fontSize: 32, 
+    fontWeight: 'bold', 
+    marginBottom: 12 
+  },
+  input: { 
+    backgroundColor: '#f1f1f1', 
+    padding: 12, 
+    borderRadius: 8, 
+    marginBottom: 20 
+  },
+  center: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center' 
+  },
+  loadingText: { 
+    marginTop: 10, 
+    color: '#666' 
+  },
+  list: { 
+    paddingBottom: 24 
+  },
+  error: { 
+    textAlign: 'center', 
+    color: '#b00020', 
+    fontSize: 16, 
+    fontWeight: '600' 
+  },
+  empty: { 
+    textAlign: 'center', 
+    marginTop: 40, 
+    color: '#666', 
+    fontSize: 16 
+  },
+  footer: { 
+    paddingVertical: 20, 
+    justifyContent: 'center', 
+    alignItems: 'center' 
+  },
 });
