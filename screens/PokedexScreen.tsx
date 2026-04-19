@@ -16,6 +16,8 @@ export const PokedexScreen = () => {
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [offset, setOffset] = useState(0);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,7 +25,7 @@ export const PokedexScreen = () => {
         setIsLoading(true);
         setError(null);
         
-        const list = await getPokemons(30);
+        const list = await getPokemons(30, 0);
         const details = await Promise.all(
           list.map(async (pokemon: any) => {
             const response = await getPokemonDetails(pokemon.url);
@@ -45,6 +47,35 @@ export const PokedexScreen = () => {
 
     fetchData();
   }, []);
+
+  const loadMorePokemons = async () => {
+    if (isFetchingMore || isLoading || search.trim().length > 0) return;
+
+    try {
+      setIsFetchingMore(true);
+      const newOffset = offset + 30;
+      
+      const list = await getPokemons(30, newOffset);
+      const details = await Promise.all(
+        list.map(async (pokemon: any) => {
+          const response = await getPokemonDetails(pokemon.url);
+          return {
+            id: response.id,
+            name: response.name,
+            types: response.types,
+            image: response.sprites.other['official-artwork'].front_default || response.sprites.front_default,
+          };
+        })
+      );
+
+      setPokemons((prevPokemons) => [...prevPokemons, ...details]);
+      setOffset(newOffset);
+    } catch (err) {
+      console.log('Erro ao carregar mais pokémons', err);
+    } finally {
+      setIsFetchingMore(false);
+    }
+  };
 
   const filteredPokemons = useMemo(
     () => pokemons.filter((pokemon) => 
@@ -68,6 +99,15 @@ export const PokedexScreen = () => {
       <Text style={styles.empty}>
         Nenhum Pokémon para exibir no momento.
       </Text>
+    );
+  };
+
+  const renderFooter = () => {
+    if (!isFetchingMore) return null;
+    return (
+      <View style={styles.footer}>
+        <ActivityIndicator size="large" color="#FF0000" />
+      </View>
     );
   };
 
@@ -108,6 +148,9 @@ export const PokedexScreen = () => {
             />
           )}
           ListEmptyComponent={renderEmptyList}
+          onEndReached={loadMorePokemons}
+          onEndReachedThreshold={0.1}
+          ListFooterComponent={renderFooter}
         />
       )}
     </View>
@@ -115,45 +158,13 @@ export const PokedexScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 40,
-    paddingHorizontal: 16,
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 12,
-  },
-  input: {
-    backgroundColor: '#f1f1f1',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 20,
-  },
-  center: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 10,
-    color: '#666',
-  },
-  list: {
-    paddingBottom: 24,
-  },
-  error: {
-    textAlign: 'center',
-    color: '#b00020',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  empty: {
-    textAlign: 'center',
-    marginTop: 40,
-    color: '#666',
-    fontSize: 16,
-  },
+  container: { flex: 1, paddingTop: 40, paddingHorizontal: 16, backgroundColor: '#fff' },
+  title: { fontSize: 32, fontWeight: 'bold', marginBottom: 12 },
+  input: { backgroundColor: '#f1f1f1', padding: 12, borderRadius: 8, marginBottom: 20 },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  loadingText: { marginTop: 10, color: '#666' },
+  list: { paddingBottom: 24 },
+  error: { textAlign: 'center', color: '#b00020', fontSize: 16, fontWeight: '600' },
+  empty: { textAlign: 'center', marginTop: 40, color: '#666', fontSize: 16 },
+  footer: { paddingVertical: 20, justifyContent: 'center', alignItems: 'center' },
 });
